@@ -20,27 +20,10 @@ namespace Runtime.Extensions
             if (_instance == null)
             {
                 _instance = this as T;
-                //DontDestroyOnLoad(instance);
             }
             else if (_instance != this)
             {
                 Destroy(this.gameObject);
-            }
-        }
-        
-        public string Classname
-        {
-            get
-            {
-                return GetType().Name;
-            }
-        }
-
-        public static string MethodName
-        {
-            get
-            {
-                return  new StackTrace().GetFrame(1).GetMethod().Name;
             }
         }
     }
