@@ -1,5 +1,4 @@
 using Runtime.Controllers;
-using Runtime.Enums;
 using Runtime.Keys;
 using Runtime.Signals;
 using UnityEngine;
@@ -14,12 +13,14 @@ namespace Runtime.Managers
         private void SubscribeEvents()
         {
             CoreGameSignals.Instance.onMatchInfosTaken += MatchInfosTaken;
+            CoreGameSignals.Instance.onMatchCompleted += MatchCompleted;
             CoreGameSignals.Instance.onReset += OnReset;
         }
 
         private void UnSubscribeEvents()
         {
             CoreGameSignals.Instance.onMatchInfosTaken -= MatchInfosTaken;
+            CoreGameSignals.Instance.onMatchCompleted -= MatchCompleted;
             CoreGameSignals.Instance.onReset -= OnReset;
         }
 
@@ -27,7 +28,11 @@ namespace Runtime.Managers
         {
             matchController.StartMatchProcess(infos);
         }
-
+        
+        private void MatchCompleted()
+        {
+            InputSignals.Instance.onInputEnable?.Invoke();
+        }
         private void OnReset()
         {
             

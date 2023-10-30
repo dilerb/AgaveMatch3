@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Mono.Cecil;
 using Runtime.Commands;
 using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
@@ -10,9 +8,12 @@ namespace Runtime.Managers
 {
     public class BoardManager: MonoBehaviour
     {
-        private BoardCreationCommand _boardCreation;
+        [SerializeField] private GameObject boardHolder;
+        
+        private BoardCreatorCommand _boardCreator;
         private BoardData _boardData;
         private GameObject[] _dropList;
+        private GameObject _tilePrefab;
         
         private void OnEnable() => SubscribeEvents();
         private void OnDisable() => UnSubscribeEvents();
@@ -21,11 +22,13 @@ namespace Runtime.Managers
         {
             SetBoardData();
             SetDropList();
+            SetTilePrefab();
             Init();
         }
         private void SetBoardData() =>  _boardData = Resources.Load<CD_Board>($"Data/CD_Board").Data;
         private void SetDropList() => _dropList = Resources.LoadAll<GameObject>($"Prefabs/Drops");
-        private void Init() => _boardCreation = new BoardCreationCommand(_boardData, this.gameObject, _dropList);
+        private void SetTilePrefab() =>  _tilePrefab = Resources.Load<GameObject>($"Prefabs/Tiles/Tile");
+        private void Init() => _boardCreator = new BoardCreatorCommand(_boardData, boardHolder, _dropList, _tilePrefab);
         private void SubscribeEvents()
         {
             CoreGameSignals.Instance.onGameStart += CreateBoard;
@@ -38,7 +41,7 @@ namespace Runtime.Managers
             CoreGameSignals.Instance.onReset -= OnReset;
         }
 
-        private void CreateBoard() => _boardCreation.Execute();
+        private void CreateBoard() => _boardCreator.Execute();
 
         private void OnReset()
         {

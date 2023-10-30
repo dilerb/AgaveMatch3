@@ -5,9 +5,9 @@ namespace Runtime.Data.ValueObjects
     [Serializable]
     public struct InputData
     {
-        public float HorizontalSwipeDistance;
-        public float VerticalSwipeDistance;
-        public float MaxHorizontalSwipeDistance;
-        public float MaxVerticalSwipeDistance;
+        public float HorizontalSwipeDistanceMin;
+        public float VerticalSwipeDistanceMin;
+        public float HorizontalSwipeDistanceMax;
+        public float VerticalSwipeDistanceMax;
     }
 }

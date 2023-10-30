@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 
 namespace Runtime.Controllers
 {
-    public class InputController
+    public class InputController: MonoBehaviour
     {
         private bool _isAvailableTouch;
         private InputData _inputData;
@@ -20,6 +20,7 @@ namespace Runtime.Controllers
         private Vector2 _firstTouchPosition;
         private Ray _ray;
         private RaycastHit _hit;
+        private bool _isRaycastSuccesful;
         internal void SetInputData(InputData data) => _inputData = data;
         internal void SetTouchAvailability(bool isAvailableForTouch) => _isAvailableTouch = isAvailableForTouch;
         
@@ -30,15 +31,18 @@ namespace Runtime.Controllers
 
             if (Input.GetMouseButtonDown(0))
             {
+                Debug.LogWarning("Mouse button DOWN");
                 ProcessTouchStart();
             }
+            
+            if (!_isRaycastSuccesful)
+                return;
 
             if (Input.GetMouseButtonUp(0))
             {
+                Debug.LogWarning("Mouse button UP");
                 ProcessTouchEnd();
             }
-            
-            InputSignals.Instance.onInputTaken?.Invoke(new MatchInfoParams(_swipeDirection, _targetDropObject));
         }
 
         private void ProcessTouchStart()
@@ -54,34 +58,40 @@ namespace Runtime.Controllers
             
             if (verticalSwipeDelta > horizontalSwipeDelta)
             {
-                if (!IsSwipeDistanceFit(Math.Abs(verticalSwipeDelta)))
-                    return;
-                    
-                // vertical swipe
+                float distance = Math.Abs(verticalSwipeDelta);
+                
+                if (distance > _inputData.VerticalSwipeDistanceMin
+                    && distance < _inputData.VerticalSwipeDistanceMax)
+                {
+                    // vertical swipe
 
-                if (verticalSwipeDelta > 0)
-                {
-                    _swipeDirection = SwipeDirection.Right;
-                }
-                else
-                {
-                    _swipeDirection = SwipeDirection.Left;
+                    if (verticalSwipeDelta > 0)
+                    {
+                        _swipeDirection = SwipeDirection.Right;
+                    }
+                    else
+                    {
+                        _swipeDirection = SwipeDirection.Left;
+                    }
                 }
             }
             else if (horizontalSwipeDelta > verticalSwipeDelta)
             {
-                if (!IsSwipeDistanceFit(Math.Abs(horizontalSwipeDelta)))
-                    return;
-                    
-                // horizontal swipe
+                float distance = Math.Abs(horizontalSwipeDelta);
+                
+                if (distance > _inputData.HorizontalSwipeDistanceMin
+                    && distance < _inputData.HorizontalSwipeDistanceMax)
+                {
+                    // horizontal swipe
                         
-                if (horizontalSwipeDelta > 0)
-                {
-                    _swipeDirection = SwipeDirection.Up;
-                }
-                else
-                {
-                    _swipeDirection = SwipeDirection.Bottom;
+                    if (horizontalSwipeDelta > 0)
+                    {
+                        _swipeDirection = SwipeDirection.Up;
+                    }
+                    else
+                    {
+                        _swipeDirection = SwipeDirection.Bottom;
+                    }
                 }
             }
             else
@@ -89,6 +99,9 @@ namespace Runtime.Controllers
                 //Debug.LogWarning("There is no swipe");
                 return;
             }
+            
+            InputSignals.Instance.onInputDisable?.Invoke();
+            InputSignals.Instance.onInputTaken?.Invoke(new MatchInfoParams(_swipeDirection, _targetDropObject));
         }
         private GameObject GetRaycastTarget()
         {
@@ -100,12 +113,21 @@ namespace Runtime.Controllers
             var results = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventData, results);
 
-            foreach (RaycastResult result in results)
+            if (results.Count > 0)
             {
-                GameObject targetObject= result.gameObject;
-                return targetObject.CompareTag("Drop") ? targetObject : null;
-            }
+                foreach (RaycastResult result in results)
+                {
+                    GameObject targetObject = result.gameObject;
 
+                    if (targetObject.CompareTag("Drop"))
+                    {
+                        _isRaycastSuccesful = true;
+                        return targetObject;
+                    }
+                }
+            }
+            
+            _isRaycastSuccesful = false;
             return null;
             
             /*_ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -118,16 +140,6 @@ namespace Runtime.Controllers
 
             return null;
             */
-        }
-        private bool IsSwipeDistanceFit(float distance)
-        {
-            if (distance > _inputData.VerticalSwipeDistance
-                && distance < _inputData.MaxVerticalSwipeDistance)
-            {
-                return true;
-            }
-
-            return false;
         }
     }
 }

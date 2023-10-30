@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 956572f01a214e83a6c00576b585ff9a, type: 3}
-  m_Name: Board
+  m_Script: {fileID: 11500000, guid: 1983d377d8204b0bb5a9a60f2337118d, type: 3}
+  m_Name: CD_Input
   m_EditorClassIdentifier: 
   Data:
-    Width: 8
-    Height: 8
-    CellSpace: 1
-    SpawnerTileList: 0000000000000000
+    HorizontalSwipeDistanceMin: 1
+    VerticalSwipeDistanceMin: 1
+    HorizontalSwipeDistanceMax: 10
+    VerticalSwipeDistanceMax: 10

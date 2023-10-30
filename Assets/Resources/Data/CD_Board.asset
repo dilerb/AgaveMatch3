@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 956572f01a214e83a6c00576b585ff9a, type: 3}
+  m_Name: CD_Board
+  m_EditorClassIdentifier: 
+  Data:
+    Width: 8
+    Height: 8
+    CellSpace: 1.3
+    SpawnerTileList: 0000000000000000

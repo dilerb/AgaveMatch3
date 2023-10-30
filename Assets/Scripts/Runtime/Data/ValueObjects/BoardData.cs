@@ -7,7 +7,7 @@ namespace Runtime.Data.ValueObjects
     {
         public short Width;
         public short Height;
-        public int CellSpace;
+        public float CellSpace;
         public bool[] SpawnerTileList;
     }
 }

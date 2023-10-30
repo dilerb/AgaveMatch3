@@ -3,7 +3,6 @@ using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
 using Runtime.Keys;
 using Runtime.Signals;
-using UnityEditor.Rendering.Universal;
 using UnityEngine;
 
 namespace Runtime.Managers
@@ -27,22 +26,22 @@ namespace Runtime.Managers
         private void SendTouchAvailability() => inputController.SetTouchAvailability(_isAvailableForTouch);
         private void SubscribeEvents()
         {
-            CoreGameSignals.Instance.onGameStart += EnableInput;
+            CoreGameSignals.Instance.onGameStart += DisableInput;
+            CoreGameSignals.Instance.onBoardCreated += EnableInput;
             CoreGameSignals.Instance.onReset += OnReset;
             InputSignals.Instance.onInputEnable += EnableInput;
             InputSignals.Instance.onInputDisable += DisableInput;
             InputSignals.Instance.onInputTaken += InputTaken;
-            InputSignals.Instance.onReset += OnReset;
         }
 
         private void UnSubscribeEvents()
         {
-            CoreGameSignals.Instance.onGameStart -= EnableInput;
+            CoreGameSignals.Instance.onGameStart -= DisableInput;
+            CoreGameSignals.Instance.onBoardCreated -= EnableInput;
             CoreGameSignals.Instance.onReset -= OnReset;
             InputSignals.Instance.onInputEnable -= EnableInput;
             InputSignals.Instance.onInputDisable -= DisableInput;
             InputSignals.Instance.onInputTaken -= InputTaken;
-            InputSignals.Instance.onReset -= OnReset;
         }
 
         private void InputTaken(MatchInfoParams matchInfos)
@@ -51,12 +50,14 @@ namespace Runtime.Managers
         }
         private void EnableInput()
         {
+            Debug.LogWarning("input enabled." + Time.time);
             _isAvailableForTouch = true;
             SendTouchAvailability();
         }
 
         private void DisableInput()
         {
+            Debug.LogWarning("input disabled." + Time.time);
             _isAvailableForTouch = false;
             SendTouchAvailability();
         }

@@ -9,6 +9,5 @@ namespace Runtime.Signals
         public UnityAction onInputEnable = delegate {  };
         public UnityAction onInputDisable = delegate {  };
         public UnityAction<MatchInfoParams> onInputTaken = delegate {  }; 
-        public UnityAction onReset = delegate {  };
     }
 }
