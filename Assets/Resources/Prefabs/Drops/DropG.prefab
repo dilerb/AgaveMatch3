@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 7483008667209966941}
   - component: {fileID: 6481926572205849892}
   - component: {fileID: 6481926572205849891}
-  - component: {fileID: 6481926572205849890}
+  - component: {fileID: -4052642559214847147}
   m_Layer: 0
   m_Name: DropG
-  m_TagString: Untagged
+  m_TagString: Drop
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -114,16 +114,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteAtlas: {fileID: 4343727234628468602, guid: e6abee705fdec40189dad6177fa7f8a1, type: 2}
   spriteName: dropG
---- !u!65 &6481926572205849890
-BoxCollider:
+--- !u!61 &-4052642559214847147
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6481926572205849888}
+  m_Enabled: 1
+  m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_Enabled: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.56, y: 2.56, z: 0.2}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 3.5, y: 3.5}
+  m_EdgeRadius: 0

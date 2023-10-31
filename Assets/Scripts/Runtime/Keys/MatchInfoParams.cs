@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Runtime.Keys
 {
-    public class MatchInfoParams
+    public struct MatchInfoParams
     {
         public SwipeDirection SwipeDirection;
         public GameObject TargetDropObject;

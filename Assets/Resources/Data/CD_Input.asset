@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: CD_Input
   m_EditorClassIdentifier: 
   Data:
-    HorizontalSwipeDistanceMin: 1
-    VerticalSwipeDistanceMin: 1
-    HorizontalSwipeDistanceMax: 10
-    VerticalSwipeDistanceMax: 10
+    MinHorizontalSwipeDistance: 50
+    MinVerticalSwipeDistance: 50
+    MaxHorizontalSwipeDistance: 200
+    MaxVerticalSwipeDistance: 200

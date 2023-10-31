@@ -26,38 +26,38 @@ namespace Runtime.Managers
         private void SendTouchAvailability() => inputController.SetTouchAvailability(_isAvailableForTouch);
         private void SubscribeEvents()
         {
-            CoreGameSignals.Instance.onGameStart += DisableInput;
-            CoreGameSignals.Instance.onBoardCreated += EnableInput;
-            CoreGameSignals.Instance.onReset += OnReset;
-            InputSignals.Instance.onInputEnable += EnableInput;
-            InputSignals.Instance.onInputDisable += DisableInput;
-            InputSignals.Instance.onInputTaken += InputTaken;
+            CoreGameSignals.Instance.OnGameStart += DisableInput;
+            CoreGameSignals.Instance.OnBoardCreated += EnableInput;
+            CoreGameSignals.Instance.OnMatchCompleted += EnableInput;
+            CoreGameSignals.Instance.OnReset += OnReset;
+            InputSignals.Instance.OnInputEnable += EnableInput;
+            InputSignals.Instance.OnInputDisable += DisableInput;
+            InputSignals.Instance.OnInputTaken += InputTaken;
         }
 
         private void UnSubscribeEvents()
         {
-            CoreGameSignals.Instance.onGameStart -= DisableInput;
-            CoreGameSignals.Instance.onBoardCreated -= EnableInput;
-            CoreGameSignals.Instance.onReset -= OnReset;
-            InputSignals.Instance.onInputEnable -= EnableInput;
-            InputSignals.Instance.onInputDisable -= DisableInput;
-            InputSignals.Instance.onInputTaken -= InputTaken;
+            CoreGameSignals.Instance.OnGameStart -= DisableInput;
+            CoreGameSignals.Instance.OnBoardCreated -= EnableInput;
+            CoreGameSignals.Instance.OnMatchCompleted -= EnableInput;
+            CoreGameSignals.Instance.OnReset -= OnReset;
+            InputSignals.Instance.OnInputEnable -= EnableInput;
+            InputSignals.Instance.OnInputDisable -= DisableInput;
+            InputSignals.Instance.OnInputTaken -= InputTaken;
         }
 
         private void InputTaken(MatchInfoParams matchInfos)
         {
-            CoreGameSignals.Instance.onMatchInfosTaken?.Invoke(matchInfos);
+            CoreGameSignals.Instance.OnMatchInfosTaken?.Invoke(matchInfos);
         }
         private void EnableInput()
         {
-            Debug.LogWarning("input enabled." + Time.time);
             _isAvailableForTouch = true;
             SendTouchAvailability();
         }
 
         private void DisableInput()
         {
-            Debug.LogWarning("input disabled." + Time.time);
             _isAvailableForTouch = false;
             SendTouchAvailability();
         }

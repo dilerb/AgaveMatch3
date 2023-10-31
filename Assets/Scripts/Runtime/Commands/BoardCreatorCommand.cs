@@ -32,8 +32,9 @@ namespace Runtime.Commands
             CreateTiles();
             SpawnDrops();
 
-            Debug.LogWarning("Board is created");
-            CoreGameSignals.Instance.onBoardCreated?.Invoke();
+            Debug.Log("Board is created");
+            CoreGameSignals.Instance.OnBoardCreated?.Invoke();
+            CoreGameSignals.Instance.OnDropListTaken?.Invoke(_dropList);
         }
 
         private void CreateTiles()

@@ -31,14 +31,14 @@ namespace Runtime.Managers
         private void Init() => _boardCreator = new BoardCreatorCommand(_boardData, boardHolder, _dropList, _tilePrefab);
         private void SubscribeEvents()
         {
-            CoreGameSignals.Instance.onGameStart += CreateBoard;
-            CoreGameSignals.Instance.onReset += OnReset;
+            CoreGameSignals.Instance.OnGameStart += CreateBoard;
+            CoreGameSignals.Instance.OnReset += OnReset;
         }
 
         private void UnSubscribeEvents()
         {
-            CoreGameSignals.Instance.onGameStart -= CreateBoard;
-            CoreGameSignals.Instance.onReset -= OnReset;
+            CoreGameSignals.Instance.OnGameStart -= CreateBoard;
+            CoreGameSignals.Instance.OnReset -= OnReset;
         }
 
         private void CreateBoard() => _boardCreator.Execute();

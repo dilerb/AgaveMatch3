@@ -6,18 +6,15 @@ namespace Runtime.Controllers
 {
     public class MatchController: MonoBehaviour
     {
-        private MatchInfoParams _matchInfo;
-        internal void StartMatchProcess(MatchInfoParams info)
+        internal void StartMatchProcess(MatchInfoParams matchInfo, GameObject[] dropList)
         {
-            _matchInfo = info;
             Debug.LogWarning("Match is started.");
             
             // do MATCH
             // ..
             // ..
-
             
-            CoreGameSignals.Instance.onMatchCompleted?.Invoke();
+            CoreGameSignals.Instance.OnMatchCompleted?.Invoke();
         }
     }
 }

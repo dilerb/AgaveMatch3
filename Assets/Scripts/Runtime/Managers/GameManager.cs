@@ -12,9 +12,9 @@ namespace Runtime.Managers
             StartGame();
         }
 
-        private void SubscribeEvents() => CoreGameSignals.Instance.onReset += OnReset;
-        private void UnSubscribeEvents() => CoreGameSignals.Instance.onReset -= OnReset;
-        private void StartGame() => CoreGameSignals.Instance.onGameStart?.Invoke();
+        private void SubscribeEvents() => CoreGameSignals.Instance.OnReset += OnReset;
+        private void UnSubscribeEvents() => CoreGameSignals.Instance.OnReset -= OnReset;
+        private void StartGame() => CoreGameSignals.Instance.OnGameStart?.Invoke();
         private void OnReset()
         {
             

@@ -1,26 +1,27 @@
 using System;
-using System.Collections.Generic;
 using Runtime.Data.ValueObjects;
 using Runtime.Enums;
 using Runtime.Keys;
 using Runtime.Signals;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Runtime.Controllers
 {
     public class InputController: MonoBehaviour
     {
-        private bool _isAvailableTouch;
+        private Camera _mainCamera;
         private InputData _inputData;
+        private bool _isAvailableTouch;
         
         private SwipeDirection _swipeDirection;
-        private GameObject _targetDropObject;
-        
         private Vector2 _firstTouchPosition;
-        private Ray _ray;
-        private RaycastHit _hit;
-        private bool _isRaycastSuccesful;
+        private GameObject _targetDropObject;
+        private bool _isRaycastSuccessful;
+        
+        private void Awake()
+        {
+            _mainCamera = Camera.main;
+        }
         internal void SetInputData(InputData data) => _inputData = data;
         internal void SetTouchAvailability(bool isAvailableForTouch) => _isAvailableTouch = isAvailableForTouch;
         
@@ -31,16 +32,14 @@ namespace Runtime.Controllers
 
             if (Input.GetMouseButtonDown(0))
             {
-                Debug.LogWarning("Mouse button DOWN");
                 ProcessTouchStart();
             }
             
-            if (!_isRaycastSuccesful)
+            if (!_isRaycastSuccessful)
                 return;
 
             if (Input.GetMouseButtonUp(0))
             {
-                Debug.LogWarning("Mouse button UP");
                 ProcessTouchEnd();
             }
         }
@@ -53,38 +52,18 @@ namespace Runtime.Controllers
 
         private void ProcessTouchEnd()
         {
-            float verticalSwipeDelta = Input.mousePosition.y - _firstTouchPosition.y;
-            float horizontalSwipeDelta = Input.mousePosition.x - _firstTouchPosition.x;
+            float swipeDeltaY = Input.mousePosition.y - _firstTouchPosition.y;
+            float swipeDeltaX = Input.mousePosition.x - _firstTouchPosition.x;
+            float swipeDistanceY = Math.Abs(swipeDeltaY);
+            float swipeDistanceX = Math.Abs(swipeDeltaX);
             
-            if (verticalSwipeDelta > horizontalSwipeDelta)
+            if (swipeDistanceY > swipeDistanceX)
             {
-                float distance = Math.Abs(verticalSwipeDelta);
-                
-                if (distance > _inputData.VerticalSwipeDistanceMin
-                    && distance < _inputData.VerticalSwipeDistanceMax)
+                // vertical swipe
+                if (swipeDistanceY > _inputData.MinVerticalSwipeDistance
+                    && swipeDistanceY < _inputData.MaxVerticalSwipeDistance)
                 {
-                    // vertical swipe
-
-                    if (verticalSwipeDelta > 0)
-                    {
-                        _swipeDirection = SwipeDirection.Right;
-                    }
-                    else
-                    {
-                        _swipeDirection = SwipeDirection.Left;
-                    }
-                }
-            }
-            else if (horizontalSwipeDelta > verticalSwipeDelta)
-            {
-                float distance = Math.Abs(horizontalSwipeDelta);
-                
-                if (distance > _inputData.HorizontalSwipeDistanceMin
-                    && distance < _inputData.HorizontalSwipeDistanceMax)
-                {
-                    // horizontal swipe
-                        
-                    if (horizontalSwipeDelta > 0)
+                    if (swipeDeltaY > 0)
                     {
                         _swipeDirection = SwipeDirection.Up;
                     }
@@ -93,6 +72,30 @@ namespace Runtime.Controllers
                         _swipeDirection = SwipeDirection.Bottom;
                     }
                 }
+                else
+                {
+                    return;
+                }
+            }
+            else if (swipeDistanceX > swipeDistanceY)
+            {
+                // horizontal swipe
+                if (swipeDistanceX > _inputData.MinHorizontalSwipeDistance
+                    && swipeDistanceX < _inputData.MaxHorizontalSwipeDistance)
+                {
+                    if (swipeDeltaX > 0)
+                    {
+                        _swipeDirection = SwipeDirection.Right;
+                    }
+                    else
+                    {
+                        _swipeDirection = SwipeDirection.Left;
+                    }
+                }
+                else
+                {
+                    return;
+                }
             }
             else
             {
@@ -100,46 +103,23 @@ namespace Runtime.Controllers
                 return;
             }
             
-            InputSignals.Instance.onInputDisable?.Invoke();
-            InputSignals.Instance.onInputTaken?.Invoke(new MatchInfoParams(_swipeDirection, _targetDropObject));
+            InputSignals.Instance.OnInputDisable?.Invoke();
+            InputSignals.Instance.OnInputTaken?.Invoke(new MatchInfoParams(_swipeDirection, _targetDropObject));
         }
         private GameObject GetRaycastTarget()
         {
-            var eventData = new PointerEventData(EventSystem.current)
-            {
-                position = Input.mousePosition
-            };
-            
-            var results = new List<RaycastResult>();
-            EventSystem.current.RaycastAll(eventData, results);
+            Vector2 mousePosInWorld = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            RaycastHit2D hit = Physics2D.Raycast(mousePosInWorld, Vector2.zero);
 
-            if (results.Count > 0)
+            var hitCollider = hit.collider;
+            if (hitCollider != null && hitCollider.CompareTag("Drop"))
             {
-                foreach (RaycastResult result in results)
-                {
-                    GameObject targetObject = result.gameObject;
-
-                    if (targetObject.CompareTag("Drop"))
-                    {
-                        _isRaycastSuccesful = true;
-                        return targetObject;
-                    }
-                }
+                _isRaycastSuccessful = true;
+                return hitCollider.gameObject;
             }
             
-            _isRaycastSuccesful = false;
+            _isRaycastSuccessful = false;
             return null;
-            
-            /*_ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
-            
-            if (Physics.Raycast(_ray, out _hit))
-            {
-                GameObject targetObject = _hit.collider.gameObject;
-                return targetObject.CompareTag("Drop") ? targetObject : null;
-            }
-
-            return null;
-            */
         }
     }
 }
