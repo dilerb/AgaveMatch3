@@ -2,9 +2,8 @@ using System.Collections.Generic;
 using DG.Tweening;
 using Runtime.Data.ValueObjects;
 using Runtime.Interfaces;
+using Runtime.Signals;
 using UnityEngine;
-using Object = UnityEngine.Object;
-using Random = UnityEngine.Random;
 
 namespace Runtime.Commands
 {
@@ -26,6 +25,9 @@ namespace Runtime.Commands
 
         public void Execute()
         {
+            CoreGameSignals.Instance.OnMatchCompleted?.Invoke();
+            return;
+            
             foreach (var fallPosition in _fallPositions)
             {
                 var upperNeighbour = fallPosition;
@@ -51,6 +53,8 @@ namespace Runtime.Commands
 
             FillEmptyTiles();
             //REGEN DROP LISTS
+
+            CoreGameSignals.Instance.OnMatchCompleted?.Invoke();
         }
 
         // OPTIMIZATION ????

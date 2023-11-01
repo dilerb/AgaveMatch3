@@ -29,12 +29,15 @@ namespace Runtime.Commands
 
         public void Execute()
         {
+            CoreGameSignals.Instance.OnBoardDataTaken?.Invoke(_boardData);
+            CoreGameSignals.Instance.OnDropListTaken?.Invoke(_dropList);
+            
             CreateTiles();
             SpawnDrops();
 
             Debug.Log("Board is created");
+            CoreGameSignals.Instance.OnTileListTaken?.Invoke(_tileList);
             CoreGameSignals.Instance.OnBoardCreated?.Invoke();
-            CoreGameSignals.Instance.OnDropListTaken?.Invoke(_dropList);
         }
 
         private void CreateTiles()

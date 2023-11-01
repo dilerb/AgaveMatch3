@@ -1,3 +1,4 @@
+using System;
 using Runtime.Commands;
 using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
@@ -25,10 +26,27 @@ namespace Runtime.Managers
             SetTilePrefab();
             Init();
         }
-        private void SetBoardData() =>  _boardData = Resources.Load<CD_Board>($"Data/CD_Board").Data;
-        private void SetDropList() => _dropList = Resources.LoadAll<GameObject>($"Prefabs/Drops");
-        private void SetTilePrefab() =>  _tilePrefab = Resources.Load<GameObject>($"Prefabs/Tiles/Tile");
-        private void Init() => _boardCreator = new BoardCreatorCommand(_boardData, boardHolder, _dropList, _tilePrefab);
+
+        private void SetBoardData()
+        {
+            _boardData = Resources.Load<CD_Board>($"Data/CD_Board").Data;
+        }
+
+        private void SetDropList()
+        {
+            _dropList = Resources.LoadAll<GameObject>($"Prefabs/Drops");
+        }
+
+        private void SetTilePrefab()
+        {
+            _tilePrefab = Resources.Load<GameObject>($"Prefabs/Tiles/Tile");
+        }
+
+        private void Init()
+        {
+            _boardCreator = new BoardCreatorCommand(_boardData, boardHolder, _dropList, _tilePrefab);
+        }
+
         private void SubscribeEvents()
         {
             CoreGameSignals.Instance.OnGameStart += CreateBoard;

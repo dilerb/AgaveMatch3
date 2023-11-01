@@ -20,6 +20,7 @@ namespace Runtime.Extensions
             if (_instance == null)
             {
                 _instance = this as T;
+                //_instance = FindObjectOfType(typeof(T)) as T;
             }
             else if (_instance != this)
             {

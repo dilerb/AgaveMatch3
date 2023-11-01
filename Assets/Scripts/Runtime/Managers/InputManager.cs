@@ -29,6 +29,7 @@ namespace Runtime.Managers
             CoreGameSignals.Instance.OnGameStart += DisableInput;
             CoreGameSignals.Instance.OnBoardCreated += EnableInput;
             CoreGameSignals.Instance.OnMatchCompleted += EnableInput;
+            CoreGameSignals.Instance.OnMatchFailed += EnableInput;
             CoreGameSignals.Instance.OnReset += OnReset;
             InputSignals.Instance.OnInputEnable += EnableInput;
             InputSignals.Instance.OnInputDisable += DisableInput;
@@ -40,6 +41,7 @@ namespace Runtime.Managers
             CoreGameSignals.Instance.OnGameStart -= DisableInput;
             CoreGameSignals.Instance.OnBoardCreated -= EnableInput;
             CoreGameSignals.Instance.OnMatchCompleted -= EnableInput;
+            CoreGameSignals.Instance.OnMatchFailed -= EnableInput;
             CoreGameSignals.Instance.OnReset -= OnReset;
             InputSignals.Instance.OnInputEnable -= EnableInput;
             InputSignals.Instance.OnInputDisable -= DisableInput;
