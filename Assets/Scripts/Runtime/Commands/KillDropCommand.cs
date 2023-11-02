@@ -1,6 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using Runtime.Interfaces;
+using Runtime.Managers;
+using Runtime.Signals;
 using UnityEngine;
 
 namespace Runtime.Commands
@@ -24,9 +27,16 @@ namespace Runtime.Commands
             foreach (var dropIndex in _matchedDrops)
             {
                 var drop = _tileList[dropIndex].transform.GetChild(0);
+    
                 drop.DOScale(drop.localScale / KillScaleFactor, KillDuration)
-                    .OnComplete(() => Object.Destroy(drop.gameObject));
+                    .OnComplete(() =>
+                    {
+                        ObjectPoolManager.Instance.DestroyDrop(drop.gameObject);
+                    });
             }
+            
+            DOTween.Sequence().AppendInterval(KillDuration + 0.1f)
+                .OnComplete(() => MatchSignals.Instance.OnDropsKilled?.Invoke());
         }
     }
 }

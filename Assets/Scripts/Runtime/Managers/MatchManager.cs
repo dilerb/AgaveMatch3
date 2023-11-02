@@ -18,6 +18,7 @@ namespace Runtime.Managers
         private void OnDisable() => UnSubscribeEvents();
         private void SubscribeEvents()
         {
+            MatchSignals.Instance.OnDropsKilled += CallDropFall;
             CoreGameSignals.Instance.OnMatchInfosTaken += MatchInfosTaken;
             CoreGameSignals.Instance.OnBoardDataTaken += GetBoardData;
             CoreGameSignals.Instance.OnDropListTaken += GetDropList;
@@ -28,6 +29,7 @@ namespace Runtime.Managers
 
         private void UnSubscribeEvents()
         {
+            MatchSignals.Instance.OnDropsKilled -= CallDropFall;
             CoreGameSignals.Instance.OnMatchInfosTaken -= MatchInfosTaken;
             CoreGameSignals.Instance.OnBoardDataTaken -= GetBoardData;
             CoreGameSignals.Instance.OnDropListTaken -= GetDropList;
@@ -41,6 +43,7 @@ namespace Runtime.Managers
         private void GetBoardData(BoardData data) => _boardData = data;
         private void SendDataToController() => matchController.SetAllData(_boardData, _tileList, _dropList);
         private void MatchInfosTaken(MatchInfoParams infos) => matchController.StartMatchProcess(infos);
+        private void CallDropFall() => matchController.CallDropFallCommand();
         private void OnReset()
         {
             

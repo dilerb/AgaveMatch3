@@ -4,7 +4,6 @@ using Runtime.Data.ValueObjects;
 using Runtime.Enums;
 using Runtime.Keys;
 using Runtime.Signals;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Runtime.Controllers
@@ -15,6 +14,7 @@ namespace Runtime.Controllers
         private List<GameObject> _tileList;
         private GameObject[] _dropList;
 
+        private List<int> _matchDropIndexListMerged;
         private HashSet<int> _matchDropIndexList1, _matchDropIndexList2; // avoid occurence
         internal void SetAllData(BoardData data, List<GameObject> tiles, GameObject[] dropList)
         {
@@ -61,31 +61,44 @@ namespace Runtime.Controllers
 
             FillMatchingDrops(firstDropIndex, secondDropIndex, matchInfo.SwipeDirection);
             
-            var matchDropIndexListMerged = new List<int>();
+            _matchDropIndexListMerged = new List<int>();
 
             if (_matchDropIndexList1.Count > 2)
             {
-                matchDropIndexListMerged.AddRange(_matchDropIndexList1);
+                _matchDropIndexListMerged.AddRange(_matchDropIndexList1);
             }
             
             if (_matchDropIndexList2.Count > 2)
             {
-                matchDropIndexListMerged.AddRange(_matchDropIndexList2);
+                _matchDropIndexListMerged.AddRange(_matchDropIndexList2);
             }
             
-            if (matchDropIndexListMerged.Count > 0)
+            CallKillDropCommand();
+            
+            if (_matchDropIndexListMerged.Count == 0)
             {
-                var killDrops = new KillDropCommand(_tileList, matchDropIndexListMerged);
-                killDrops.Execute();
-
-                var dropFall = new DropFallCommand(_boardData, _dropList, fallPositions, _tileList);
-                dropFall.Execute();
+                ReverseSwap(ref firstDropIndex, ref secondDropIndex);
             }
-            else
-            {
-                var reverseSwap = new SwapDropCommand(_tileList);
-                reverseSwap.Execute(ref firstDropIndex, ref secondDropIndex);
-            }
+        }
+        
+        private void ReverseSwap(ref int firstDropIndex, ref int secondDropIndex)
+        {
+            var reverseSwap = new SwapDropCommand(_tileList);
+            reverseSwap.Execute(ref firstDropIndex, ref secondDropIndex);
+            CoreGameSignals.Instance.OnMatchFailed?.Invoke();
+        }
+        private void CallKillDropCommand()
+        {
+            if (_matchDropIndexListMerged.Count <= 0) 
+                return;
+            
+            var killDrops = new KillDropCommand(_tileList, _matchDropIndexListMerged);
+            killDrops.Execute();
+        }
+        internal void CallDropFallCommand()
+        {
+            var dropFall = new DropFallCommand(_boardData, _dropList, _matchDropIndexListMerged, _tileList);
+            dropFall.Execute();
         }
 
         private void FillMatchingDrops(int firstDropIndex, int secondDropIndex, SwipeDirection direction)
@@ -103,14 +116,16 @@ namespace Runtime.Controllers
                     LeftMatchCheck(ref _matchDropIndexList1, firstDropType, firstDropIndex, firstDropBorders);
                     RightMatchCheck(ref _matchDropIndexList2, secondDropType, secondDropIndex, secondDropBorders);
                 
-                    if (_matchDropIndexList1.Count == 0)
+                    if (_matchDropIndexList1.Count  < 3)
                     {
+                        _matchDropIndexList1.Clear();
                         UpperMatchCheck(ref _matchDropIndexList1, firstDropType, firstDropIndex, firstDropBorders);
                         BottomMatchCheck(ref _matchDropIndexList1, firstDropType, firstDropIndex, firstDropBorders);
                     }
 
-                    if (_matchDropIndexList2.Count == 0)
+                    if (_matchDropIndexList2.Count  < 3)
                     {
+                        _matchDropIndexList2.Clear();
                         UpperMatchCheck(ref _matchDropIndexList2, secondDropType, secondDropIndex, secondDropBorders);
                         BottomMatchCheck(ref _matchDropIndexList2, secondDropType, secondDropIndex, secondDropBorders);
                     }
@@ -122,14 +137,16 @@ namespace Runtime.Controllers
                     RightMatchCheck(ref _matchDropIndexList1, firstDropType, firstDropIndex, firstDropBorders);
                     LeftMatchCheck(ref _matchDropIndexList2, secondDropType, secondDropIndex, secondDropBorders);
 
-                    if (_matchDropIndexList1.Count == 0)
+                    if (_matchDropIndexList1.Count < 3)
                     {
+                        _matchDropIndexList1.Clear();
                         UpperMatchCheck(ref _matchDropIndexList1, firstDropType, firstDropIndex, firstDropBorders);
                         BottomMatchCheck(ref _matchDropIndexList1, firstDropType, firstDropIndex, firstDropBorders);
                     }
 
-                    if (_matchDropIndexList2.Count == 0)
+                    if (_matchDropIndexList2.Count < 3)
                     {
+                        _matchDropIndexList2.Clear();
                         UpperMatchCheck(ref _matchDropIndexList2, secondDropType, secondDropIndex, secondDropBorders);
                         BottomMatchCheck(ref _matchDropIndexList2, secondDropType, secondDropIndex, secondDropBorders);
                     }
@@ -141,17 +158,18 @@ namespace Runtime.Controllers
                     UpperMatchCheck(ref _matchDropIndexList1, firstDropType, firstDropIndex, firstDropBorders);
                     BottomMatchCheck(ref _matchDropIndexList2, secondDropType, secondDropIndex, secondDropBorders);
                 
-                    if (_matchDropIndexList1.Count == 0)
+                    if (_matchDropIndexList1.Count < 3)
                     {
+                        _matchDropIndexList1.Clear();
                         LeftMatchCheck(ref _matchDropIndexList1, firstDropType, firstDropIndex, firstDropBorders);
                         RightMatchCheck(ref _matchDropIndexList1, firstDropType, firstDropIndex, firstDropBorders);
                     }
 
-                    if (_matchDropIndexList2.Count == 0)
+                    if (_matchDropIndexList2.Count < 3)
                     {
+                        _matchDropIndexList2.Clear();
                         LeftMatchCheck(ref _matchDropIndexList2, secondDropType, secondDropIndex, secondDropBorders);
                         RightMatchCheck(ref _matchDropIndexList2, secondDropType, secondDropIndex, secondDropBorders);
-                        
                     }
 
                     break;
@@ -161,14 +179,16 @@ namespace Runtime.Controllers
                     BottomMatchCheck(ref _matchDropIndexList1, firstDropType, firstDropIndex, firstDropBorders);
                     UpperMatchCheck(ref _matchDropIndexList2, secondDropType, secondDropIndex, secondDropBorders);
                 
-                    if (_matchDropIndexList1.Count == 0)
+                    if (_matchDropIndexList1.Count < 3)
                     {
+                        _matchDropIndexList1.Clear();
                         LeftMatchCheck(ref _matchDropIndexList1, firstDropType, firstDropIndex, firstDropBorders);
                         RightMatchCheck(ref _matchDropIndexList1, firstDropType, firstDropIndex, firstDropBorders);
                     }
 
-                    if (_matchDropIndexList2.Count == 0)
+                    if (_matchDropIndexList2.Count < 3)
                     {
+                        _matchDropIndexList2.Clear();
                         LeftMatchCheck(ref _matchDropIndexList2, secondDropType, secondDropIndex, secondDropBorders);
                         RightMatchCheck(ref _matchDropIndexList2, secondDropType, secondDropIndex, secondDropBorders);
                     }
@@ -180,79 +200,89 @@ namespace Runtime.Controllers
 
         private void LeftMatchCheck(ref HashSet<int> matchDropIndexList, DropType dropType, int dropIndex, BorderIndex borders)
         {
-            if (dropIndex - 1 >= borders.Left && dropIndex - 2 >= borders.Left)
+            var adjacent1 = dropIndex - 1;
+            var adjacent2 = dropIndex - 2;
+            
+            if (adjacent1 < borders.Left) 
+                return;
+            
+            if (CheckAdjacentMatch(adjacent1, dropType))
             {
-                var adjacents = new List<int>();
+                matchDropIndexList.Add(adjacent1);
 
-                adjacents.Add(dropIndex - 1);
-                adjacents.Add(dropIndex - 2);
-                
-                if (CheckAdjacentMatch(ref adjacents, dropType))
+                if (adjacent2 >= borders.Left && CheckAdjacentMatch(adjacent2, dropType))
                 {
-                    matchDropIndexList.Add(dropIndex);
-                    matchDropIndexList.AddRange(adjacents);
+                    matchDropIndexList.Add(adjacent2);
                 }
             }
+            
+            matchDropIndexList.Add(dropIndex);
         }
         private void RightMatchCheck(ref HashSet<int> matchDropIndexList, DropType dropType, int dropIndex, BorderIndex borders)
         {
-            if (dropIndex + 1 <= borders.Right && dropIndex + 2 <= borders.Right)
-            {
-                var adjacents = new List<int>();
+            var adjacent1 = dropIndex + 1;
+            var adjacent2 = dropIndex + 2;
 
-                adjacents.Add(dropIndex + 1);
-                adjacents.Add(dropIndex + 2);
-                
-                if (CheckAdjacentMatch(ref adjacents, dropType))
+            if (adjacent1 > borders.Right) 
+                return;
+            
+            if (CheckAdjacentMatch(adjacent1, dropType))
+            {
+                matchDropIndexList.Add(adjacent1);
+
+                if (adjacent2 <= borders.Right && CheckAdjacentMatch(adjacent2, dropType))
                 {
-                    matchDropIndexList.Add(dropIndex);
-                    matchDropIndexList.AddRange(adjacents);
+                    matchDropIndexList.Add(adjacent2);
                 }
             }
+
+            matchDropIndexList.Add(dropIndex);
         }
         private void UpperMatchCheck(ref HashSet<int> matchDropIndexList, DropType dropType, int dropIndex, BorderIndex borders)
         {
-            if (dropIndex + _boardData.Width <= borders.Top && dropIndex + _boardData.Width * 2 <= borders.Top)
-            {
-                var adjacents = new List<int>();
+            var adjacent1 = dropIndex + _boardData.Width;
+            var adjacent2 = dropIndex + _boardData.Width * 2;
 
-                adjacents.Add(dropIndex + _boardData.Width);
-                adjacents.Add(dropIndex + _boardData.Width * 2);
-                
-                if (CheckAdjacentMatch(ref adjacents, dropType))
+            if (adjacent1 > borders.Top) 
+                return;
+            
+            if (CheckAdjacentMatch(adjacent1, dropType))
+            {
+                matchDropIndexList.Add(adjacent1);
+
+                if (adjacent2 <= borders.Top && CheckAdjacentMatch(adjacent2, dropType))
                 {
-                    matchDropIndexList.Add(dropIndex);
-                    matchDropIndexList.AddRange(adjacents);
+                    matchDropIndexList.Add(adjacent2);
                 }
             }
+
+            matchDropIndexList.Add(dropIndex);
         }
         private void BottomMatchCheck(ref HashSet<int> matchDropIndexList, DropType dropType, int dropIndex, BorderIndex borders)
         {
-            if (dropIndex - _boardData.Width >= borders.Bottom && dropIndex - _boardData.Width * 2 >= borders.Bottom)
-            {
-                var adjacents = new List<int>();
+            var adjacent1 = dropIndex - _boardData.Width;
+            var adjacent2 = dropIndex - _boardData.Width * 2;
 
-                adjacents.Add(dropIndex - _boardData.Width);
-                adjacents.Add(dropIndex - _boardData.Width * 2);
-                
-                if (CheckAdjacentMatch(ref adjacents, dropType))
+            if (adjacent1 < borders.Bottom) 
+                return;
+            
+            if (CheckAdjacentMatch(adjacent1, dropType))
+            {
+                matchDropIndexList.Add(adjacent1);
+
+                if (adjacent2 >= borders.Bottom && CheckAdjacentMatch(adjacent2, dropType))
                 {
-                    matchDropIndexList.Add(dropIndex);
-                    matchDropIndexList.AddRange(adjacents);
+                    matchDropIndexList.Add(adjacent2);
                 }
             }
+
+            matchDropIndexList.Add(dropIndex);
         }
 
-        private bool CheckAdjacentMatch(ref List<int> adjacents, DropType dropType)
+        private bool CheckAdjacentMatch(int adjacent, DropType dropType)
         {
-            if (CheckDropExist(adjacents[0]) && _tileList[adjacents[0]].GetComponentInChildren<Drop>().dropType == dropType)
+            if (CheckDropExist(adjacent) && _tileList[adjacent].GetComponentInChildren<Drop>().dropType == dropType)
             {
-                if (CheckDropExist(adjacents[1]) && _tileList[adjacents[1]].GetComponentInChildren<Drop>().dropType == dropType)
-                {
-                    return true;
-                }
-
-                adjacents.Remove(adjacents[1]);
                 return true;
             }
 

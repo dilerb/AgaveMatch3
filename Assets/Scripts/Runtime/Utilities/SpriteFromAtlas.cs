@@ -1,3 +1,5 @@
+using Sirenix.OdinInspector;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -11,7 +13,13 @@ namespace Runtime.Utilities
 
         private void Start()
         {
-            var sprite = spriteAtlas.GetSprite(spriteName);
+            GenerateSprite(spriteName);
+        }
+        
+        [Button]
+        public void GenerateSprite(string s)
+        {
+            var sprite = spriteAtlas.GetSprite(s);
 
             if (sprite != null)
             {
@@ -19,7 +27,7 @@ namespace Runtime.Utilities
             }
             else
             {
-                Debug.LogWarning("Sprite not found!: " + spriteName);
+                Debug.LogWarning("Sprite not found!: " + s);
             }
         }
     }

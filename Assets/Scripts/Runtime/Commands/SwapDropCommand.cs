@@ -8,7 +8,6 @@ namespace Runtime.Commands
     public class SwapDropCommand: ICommand
     {
         private const float SwapDuration = 0.2f;
-        
         private readonly List<GameObject> _tileList;
         
         public SwapDropCommand(List<GameObject> tileList)
@@ -29,9 +28,6 @@ namespace Runtime.Commands
             var temp = firstItemIndex;
             firstItemIndex = secondItemIndex;
             secondItemIndex = temp;
-
-            //firstItem.DOLocalMove(Vector2.zero, SwapDuration);
-            //secondItem.DOLocalMove(Vector2.zero, SwapDuration);
 
             firstItem.localPosition = Vector2.zero;
             secondItem.localPosition = Vector2.zero;

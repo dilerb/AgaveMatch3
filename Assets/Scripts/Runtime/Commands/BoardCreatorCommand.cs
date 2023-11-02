@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using System.Linq;
 using Runtime.Data.ValueObjects;
 using Runtime.Enums;
 using Runtime.Interfaces;
 using Runtime.Keys;
+using Runtime.Managers;
 using Runtime.Signals;
 using Runtime.Utilities;
 using UnityEngine;
@@ -12,6 +12,7 @@ namespace Runtime.Commands
 {
     public class BoardCreatorCommand: ICommand
     {
+        private static readonly Vector2 BoardPosition = new Vector2(-4.5f, -4.5f);
         private readonly BoardData _boardData;
         private readonly GameObject _boardHolder;
         private readonly GameObject[] _dropList;
@@ -33,12 +34,18 @@ namespace Runtime.Commands
             CoreGameSignals.Instance.OnDropListTaken?.Invoke(_dropList);
             
             CreateTiles();
-            SpawnDrops();
-
+            
+            var dropSpawn = new DropSpawnCommand(_boardData, _tileList);
+            dropSpawn.Execute();
+            
+            SetBoardPosition();
+            
             Debug.Log("Board is created");
             CoreGameSignals.Instance.OnTileListTaken?.Invoke(_tileList);
             CoreGameSignals.Instance.OnBoardCreated?.Invoke();
         }
+
+        private void SetBoardPosition() => _boardHolder.transform.localPosition = BoardPosition;
 
         private void CreateTiles()
         {
@@ -54,70 +61,6 @@ namespace Runtime.Commands
                     _tileList.Add(spawnedTile);
                 }
             }
-        }
-
-        private void SpawnDrops()
-        {
-            for (int i = 0; i < _tileList.Count; i++)
-            {
-                List<DropType> typeList = EnumToList.Convert<DropType>();
-
-                while (typeList.Count > 0)
-                {
-                    var randomType = typeList[Random.Range(0, typeList.Count)];
-
-                    if (CheckAnyMatchOnPosition(randomType, i))
-                    {
-                        typeList.Remove(randomType);
-                        Debug.Log("Match found! Retrying...");
-                    }
-                    else
-                    {
-                        // USE Object Pooling !!!
-
-                        var spawnObject = _dropList.FirstOrDefault(item => item.GetComponent<Drop>().dropType == randomType);
-                        Object.Instantiate(spawnObject, _tileList[i].transform);
-                        break;
-                    }
-                }
-            }
-        }
-
-        private bool CheckAnyMatchOnPosition(DropType type, int tilePosition)
-        {
-            // SCAN STARTS FROM LEFT-BOTTOM TO RIGHT-UP
-            
-            // LEFT CHECK 
-            
-            if (tilePosition % _boardData.Width > 1)
-            {
-                var neighbourL1 = _tileList[tilePosition - 1].GetComponentInChildren<Drop>().dropType;
-                if (type == neighbourL1)
-                {
-                    var neighbourL2 = _tileList[tilePosition - 2].GetComponentInChildren<Drop>().dropType;
-                    if (type == neighbourL2)
-                    {
-                        return true;
-                    }
-                }
-            }
-            
-            // BOTTOM CHECK
-            
-            if (tilePosition > (_boardData.Width * 2) - 1)
-            {
-                var neighbourB1 = _tileList[tilePosition - _boardData.Width].GetComponentInChildren<Drop>().dropType;
-                if (type == neighbourB1)
-                {
-                    var neighbourB2 = _tileList[tilePosition - (_boardData.Width * 2)].GetComponentInChildren<Drop>().dropType;
-                    if (type == neighbourB2)
-                    {
-                        return true;
-                    }
-                }
-            }
-            
-            return false;
         }
     }
 }
