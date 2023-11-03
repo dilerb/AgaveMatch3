@@ -11,18 +11,16 @@ namespace Runtime.Commands
     public class DropFallCommand: ICommand
     {
         private const float FallDuration = 0.2f;
+        private readonly BoardData _data;
         private readonly List<GameObject> _tileList;
         private readonly List<int> _fallPositions;
-        private readonly GameObject[] _dropList;
-        private readonly bool[] _spawnerData;
         private readonly short _boardWidth, _boardHeight;
         
-        public DropFallCommand(BoardData data, GameObject[] dropList, List<int> fallPositions, List<GameObject> tileList)
+        public DropFallCommand(BoardData data, List<int> fallPositions, List<GameObject> tileList)
         {
-            _boardWidth = data.Width;
-            _boardHeight = data.Height;
-            _spawnerData = data.SpawnerTileList;
-            _dropList = dropList;
+            _data = data;
+            _boardWidth = _data.Width;
+            _boardHeight = _data.Height;
             _fallPositions = fallPositions;
             _tileList = tileList;
         }
@@ -65,21 +63,8 @@ namespace Runtime.Commands
 
         private void FillEmptyTiles()
         {
-            for (short i = 0; i < _tileList.Count; i++)
-            {
-                if (_tileList[i].transform.childCount == 0)
-                {
-                    SpawnDrop(i);
-                }
-            }
-        }
-
-        private void SpawnDrop(int fallPosition)
-        {
-            if (_spawnerData[fallPosition % _boardWidth]) // On spawner tile
-            {
-                ObjectPoolManager.Instance.InstantiateDrop(Vector3.zero, Quaternion.identity, -1, _tileList[fallPosition].transform);
-            }
+            var dropSpawn = new DropSpawnCommand(_data, _tileList, true);
+            dropSpawn.Execute();
         }
 
         private void FallDropObject(Transform targetDrop, int fallPosition)

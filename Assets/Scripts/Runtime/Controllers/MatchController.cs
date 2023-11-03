@@ -97,7 +97,7 @@ namespace Runtime.Controllers
         }
         internal void CallDropFallCommand()
         {
-            var dropFall = new DropFallCommand(_boardData, _dropList, _matchDropIndexListMerged, _tileList);
+            var dropFall = new DropFallCommand(_boardData, _matchDropIndexListMerged, _tileList);
             dropFall.Execute();
         }
 

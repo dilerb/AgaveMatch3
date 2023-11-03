@@ -13,17 +13,25 @@ namespace Runtime.Commands
     {
         private readonly BoardData _boardData;
         private readonly List<GameObject> _tileList;
+        private readonly bool _checkSpawnerTile;
         
-        public DropSpawnCommand(BoardData data, List<GameObject> tiles)
+        public DropSpawnCommand(BoardData data, List<GameObject> tiles, bool check)
         {
             _boardData = data;
             _tileList = tiles;
+            _checkSpawnerTile = check;
         }
 
         public void Execute()
         {
             for (int i = 0; i < _tileList.Count; i++)
             {
+                if (_tileList[i].transform.childCount > 0)
+                    continue;
+
+                if(_checkSpawnerTile && !_boardData.SpawnerTileList[i % _boardData.Width])
+                    continue;
+                
                 var typeList = EnumToList.Convert<DropType>();
 
                 while (typeList.Count > 0)
@@ -46,12 +54,14 @@ namespace Runtime.Commands
         
         private bool CheckAnyMatchOnPosition(DropType type, int tilePosition)
         {
-            // SCAN STARTS FROM LEFT-BOTTOM TO RIGHT-UP
-            
             // LEFT CHECK 
             
             if (tilePosition % _boardData.Width > 1)
             {
+                if (_tileList[tilePosition - 1].transform.childCount == 0 || 
+                    _tileList[tilePosition - 2].transform.childCount == 0)
+                    return false;
+                
                 var neighbourL1 = _tileList[tilePosition - 1].GetComponentInChildren<Drop>().dropType;
                 if (type == neighbourL1)
                 {
@@ -67,11 +77,35 @@ namespace Runtime.Commands
             
             if (tilePosition > (_boardData.Width * 2) - 1)
             {
+                if (_tileList[tilePosition - _boardData.Width].transform.childCount == 0 || 
+                    _tileList[tilePosition - (_boardData.Width * 2)].transform.childCount == 0)
+                    return false;
+                
                 var neighbourB1 = _tileList[tilePosition - _boardData.Width].GetComponentInChildren<Drop>().dropType;
                 if (type == neighbourB1)
                 {
                     var neighbourB2 = _tileList[tilePosition - (_boardData.Width * 2)].GetComponentInChildren<Drop>().dropType;
                     if (type == neighbourB2)
+                    {
+                        return true;
+                    }
+                }
+
+            }
+            
+            // RIGHT CHECK
+            
+            if (tilePosition % _boardData.Width < _boardData.Width - 2)
+            {
+                if (_tileList[tilePosition + 1].transform.childCount == 0 || 
+                    _tileList[tilePosition + 2].transform.childCount == 0)
+                    return false;
+                
+                var neighbourR1 = _tileList[tilePosition + 1].GetComponentInChildren<Drop>().dropType;
+                if (type == neighbourR1)
+                {
+                    var neighbourR2 = _tileList[tilePosition + 2].GetComponentInChildren<Drop>().dropType;
+                    if (type == neighbourR2)
                     {
                         return true;
                     }

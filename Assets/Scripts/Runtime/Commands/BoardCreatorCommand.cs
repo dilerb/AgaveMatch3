@@ -35,7 +35,7 @@ namespace Runtime.Commands
             
             CreateTiles();
             
-            var dropSpawn = new DropSpawnCommand(_boardData, _tileList);
+            var dropSpawn = new DropSpawnCommand(_boardData, _tileList, false);
             dropSpawn.Execute();
             
             SetBoardPosition();
